@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextLevel - AI Game Recommender</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fa-solid fa-gamepad"></i>
+                <h1>Next<span>Level</span></h1>
+            </div>
+            <p class="subtitle">Discover your next obsession powered by AI.</p>
+        </header>
+
+        <main>
+            <div class="search-container glass-panel">
+                <form id="recommendation-form">
+                    <div class="input-group">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="query-input" placeholder="e.g. 'A relaxing farming sim like Stardew Valley'" required autocomplete="off">
+                        <button type="submit" id="search-btn">
+                            <span>Find Games</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="loading-state" class="hidden">
+                <div class="loader">
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                </div>
+                <p>Analyzing the gaming multiverse...</p>
+            </div>
+
+            <div id="error-message" class="hidden error-toast glass-panel">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span id="error-text">An error occurred. Please try again.</span>
+            </div>
+
+            <div id="results-container" class="results-grid hidden">
+                <!-- Game cards will be injected here -->
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
