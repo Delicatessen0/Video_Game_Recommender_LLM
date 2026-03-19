@@ -1,37 +1,46 @@
 import os
 import json
-import google.generativeai as genai
+from dotenv import load_dotenv
+from huggingface_hub import InferenceClient
 from steam_data import fetch_steam_game_details
 
-# Configure Gemini
-api_key = os.environ.get("GEMINI_API_KEY", "")
-if api_key:
-    genai.configure(api_key=api_key)
+# Load .env so HF_TOKEN is available regardless of import order
+load_dotenv()
+
+# Lazily resolve the token so it is read after dotenv is loaded
+def _get_client():
+    api_key = os.environ.get("HF_TOKEN", "")
+    if api_key:
+        return InferenceClient(api_key=api_key)
+    return None
 
 def get_recommendations(query):
-    # If no key, we try to use a mock for demonstration
-    if not api_key:
+    client = _get_client()
+    if not client:
         return get_mock_recommendations(query)
 
-    model = genai.GenerativeModel('gemini-2.5-flash')
-    
     prompt = f"""
     Suggest 3 video games for a user who asked: "{query}".
-    Focus on games available on Steam.
-    Return ONLY a JSON array of objects representing the games.
+    Focus on games available on Steam. Make sure to recommend games relevant to the query — do NOT always suggest the same games.
+    Return ONLY a valid JSON array of objects, with no extra text before or after.
     For each game, include exactly these fields:
-    - title: The name of the game
+    - title: The exact name of the game as listed on Steam
     - reason: A short 1-2 sentence reason why it fits the user's query
 
     Example response format:
     [
         {{"title": "Stardew Valley", "reason": "A highly relaxing farming sim..."}}
     ]
+    Only output the JSON array. Do not include any explanation or markdown.
     """
     
     try:
-        response = model.generate_content(prompt)
-        text = response.text
+        response = client.chat.completions.create(
+            model="meta-llama/Llama-3.3-70B-Instruct",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=600,
+        )
+        text = response.choices[0].message.content
         # Clean markdown formatting if present
         text = text.strip()
         if text.startswith('```json'):

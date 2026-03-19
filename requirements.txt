@@ -1,4 +1,4 @@
 Flask
 requests
-google-generativeai
+huggingface_hub
 python-dotenv

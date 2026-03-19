@@ -19,7 +19,7 @@ def search_steam_game(title):
     return None
 
 def get_game_details(appid):
-    url = f"https://store.steampowered.com/api/appdetails?appids={appid}"
+    url = f"https://store.steampowered.com/api/appdetails?appids={appid}&cc=US&l=english"
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()
@@ -31,9 +31,14 @@ def get_game_details(appid):
             
             # Extract relevant info
             price_overview = game_data.get('price_overview', {})
-            price = price_overview.get('final_formatted', 'Free or Unknown')
             if game_data.get('is_free'):
                 price = "Free to Play"
+            elif price_overview:
+                # Prefer pre-formatted USD price; fall back to computing from cents
+                price = price_overview.get('final_formatted') or \
+                        f"${price_overview.get('final', 0) / 100:.2f} USD"
+            else:
+                price = "Price Unavailable"
                 
             return {
                 "steam_id": appid,

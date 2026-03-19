@@ -7,6 +7,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultsContainer = document.getElementById('results-container');
     const searchBtn = document.getElementById('search-btn');
 
+    // Fun placeholder cycling
+    const placeholders = [
+        "e.g. 'A relaxing farming sim like Stardew Valley'",
+        "e.g. 'A challenging soulslike with deep lore'",
+        "e.g. 'Co-op games to play with non-gamer friends'",
+        "e.g. 'Strategy games set in space'"
+    ];
+    let placeholderIdx = 0;
+    setInterval(() => {
+        placeholderIdx = (placeholderIdx + 1) % placeholders.length;
+        queryInput.setAttribute('placeholder', placeholders[placeholderIdx]);
+    }, 4000);
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 

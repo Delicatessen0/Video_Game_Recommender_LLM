@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +14,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
     <div class="background-blobs">
         <div class="blob blob-1"></div>
@@ -26,7 +28,7 @@
                 <i class="fa-solid fa-gamepad"></i>
                 <h1>Next<span>Level</span></h1>
             </div>
-            <p class="subtitle">Discover your next obsession powered by AI.</p>
+            <p class="subtitle">Discover your next gaming obsession.</p>
         </header>
 
         <main>
@@ -34,7 +36,8 @@
                 <form id="recommendation-form">
                     <div class="input-group">
                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        <input type="text" id="query-input" placeholder="e.g. 'A relaxing farming sim like Stardew Valley'" required autocomplete="off">
+                        <input type="text" id="query-input"
+                            placeholder="e.g. 'A relaxing farming sim like Stardew Valley'" required autocomplete="off">
                         <button type="submit" id="search-btn">
                             <span>Find Games</span>
                             <i class="fa-solid fa-arrow-right"></i>
@@ -65,4 +68,5 @@
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
+
 </html>
