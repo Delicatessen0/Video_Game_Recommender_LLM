@@ -1,11 +1,17 @@
 import os
+import sys
 import json
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
 from steam_data import fetch_steam_game_details
 
 # Load .env so HF_TOKEN is available regardless of import order
-load_dotenv()
+if getattr(sys, 'frozen', False):
+    # If bundled, look for .env in the temporary folder
+    env_path = os.path.join(sys._MEIPASS, '.env')
+    load_dotenv(env_path)
+else:
+    load_dotenv()
 
 # Lazily resolve the token so it is read after dotenv is loaded
 def _get_client():
