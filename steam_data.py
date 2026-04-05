@@ -2,8 +2,20 @@ import requests
 import time
 
 def search_steam_game(title):
-    # Using the Steam Storefront API to search
-    url = f"https://store.steampowered.com/api/storesearch/?term={title}&l=english&cc=US"
+    # Try searching with the exact title first
+    result = _execute_search(title)
+    if result:
+        return result
+        
+    # If it fails, try a "cleaner" version (remove special characters)
+    clean_title = "".join(char for char in title if char.isalnum() or char.isspace())
+    if clean_title != title:
+        return _execute_search(clean_title)
+    
+    return None
+
+def _execute_search(term):
+    url = f"https://store.steampowered.com/api/storesearch/?term={term}&l=english&cc=US"
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()
@@ -15,7 +27,7 @@ def search_steam_game(title):
             appid = item['id']
             return get_game_details(appid)
     except Exception as e:
-        print(f"Error searching Steam for '{title}': {e}")
+        print(f"Error searching Steam for '{term}': {e}")
     return None
 
 def get_game_details(appid):
@@ -34,11 +46,13 @@ def get_game_details(appid):
             if game_data.get('is_free'):
                 price = "Free to Play"
             elif price_overview:
-                # Prefer pre-formatted USD price; fall back to computing from cents
-                price = price_overview.get('final_formatted') or \
-                        f"${price_overview.get('final', 0) / 100:.2f} USD"
+                # Use pre-formatted string if available, otherwise format manually
+                price = price_overview.get('final_formatted')
+                if not price:
+                    raw_price = price_overview.get('final', 0) / 100
+                    price = f"${raw_price:.2f}"
             else:
-                price = "Price Unavailable"
+                price = None # Let frontend handle missing price
                 
             return {
                 "steam_id": appid,

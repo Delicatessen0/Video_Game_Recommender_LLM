@@ -3,7 +3,8 @@ from flask import Flask, jsonify, request, render_template
 from dotenv import load_dotenv
 from llm_recommender import get_recommendations
 
-load_dotenv()
+if os.path.exists('.env'):
+    load_dotenv()
 
 import sys
 
@@ -13,6 +14,7 @@ if getattr(sys, 'frozen', False):
     app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
 else:
     app = Flask(__name__)
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -39,7 +41,9 @@ from threading import Timer
 
 if __name__ == '__main__':
     def open_browser():
-        webbrowser.open_new("http://localhost:5000")
+        if not os.environ.get("RENDER"):
+            webbrowser.open_new("http://localhost:5000")
         
     Timer(1, open_browser).start()
-    app.run(debug=False, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)

@@ -32,10 +32,11 @@ def get_recommendations(query):
     For each game, include exactly these fields:
     - title: The exact name of the game as listed on Steam
     - reason: A short 1-2 sentence reason why it fits the user's query
+    - tags: An array of 3 short genre/theme tags (e.g., ["RPG", "Action", "Horror"])
 
     Example response format:
     [
-        {{"title": "Stardew Valley", "reason": "A highly relaxing farming sim..."}}
+        {{"title": "Stardew Valley", "reason": "A highly relaxing farming sim...", "tags": ["Farming", "Relaxing", "RPG"]}}
     ]
     Only output the JSON array. Do not include any explanation or markdown.
     """
@@ -44,23 +45,24 @@ def get_recommendations(query):
         response = client.chat.completions.create(
             model="meta-llama/Llama-3.3-70B-Instruct",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=600,
+            max_tokens=800,
         )
-        text = response.choices[0].message.content
-        # Clean markdown formatting if present
-        text = text.strip()
-        if text.startswith('```json'):
-            text = text[7:]
-        if text.endswith('```'):
-            text = text[:-3]
+        text = response.choices[0].message.content.strip()
         
-        games = json.loads(text.strip())
+        # Robust JSON extraction: Find the first '[' and the last ']'
+        start_idx = text.find('[')
+        end_idx = text.rfind(']')
+        if start_idx != -1 and end_idx != -1:
+            text = text[start_idx:end_idx + 1]
+            
+        games = json.loads(text)
         
         # Enrich with Steam data
         enriched_games = []
         for game in games:
             details = fetch_steam_game_details(game['title'])
             if details:
+                # Merge Steam data, prioritizing actual Steam tags if found
                 game.update(details)
             enriched_games.append(game)
             
@@ -73,9 +75,9 @@ def get_mock_recommendations(query):
     # Fallback to mock data if API key is missing or fails
     print("Using MOCK data for recommendations.")
     games = [
-        {"title": "Stardew Valley", "reason": "A perfect relaxing farming game that matches your vibe."},
-        {"title": "Terraria", "reason": "Explore, build, and fight in a 2D sandbox world with deep progression."},
-        {"title": "Factorio", "reason": "Automate everything and build massive factories."}
+        {"title": "Stardew Valley", "reason": "A perfect relaxing farming game that matches your vibe.", "tags": ["Farming", "Relaxing", "RPG"]},
+        {"title": "Terraria", "reason": "Explore, build, and fight in a 2D sandbox world with deep progression.", "tags": ["Sandbox", "Crafting", "Action"]},
+        {"title": "Factorio", "reason": "Automate everything and build massive factories.", "tags": ["Automation", "Strategy", "Management"]}
     ]
     
     enriched_games = []

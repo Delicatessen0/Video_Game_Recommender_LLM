@@ -73,14 +73,22 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'game-card glass-panel';
             card.style.animationDelay = `${index * 0.15}s`;
 
-            // Default image if Steam API didn't return one
-            const imageUrl = game.image_url || 'https://via.placeholder.com/400x200/21262d/8b949e?text=' + encodeURIComponent(game.title);
+            // Improved image handling: prioritize Steam image, then a styled placeholder
+            let imageUrl = game.image_url;
+            let hasImage = !!imageUrl;
+            
+            if (!hasImage) {
+                // Use a high-quality gaming-themed placeholder with the game title
+                imageUrl = `https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=800&ixlib=rb-4.0.3`;
+            }
 
-            // Generate genre tags
+            // Tags: Prioritize Steam genres, fallback to LLM tags
+            const displayTags = (game.genres && game.genres.length > 0) ? game.genres : (game.tags || []);
+            
             let genresHtml = '';
-            if (game.genres && game.genres.length > 0) {
+            if (displayTags.length > 0) {
                 genresHtml = `<div class="card-genres">
-                    ${game.genres.slice(0, 3).map(g => `<span class="genre-badge">${g}</span>`).join('')}
+                    ${displayTags.slice(0, 3).map(g => `<span class="genre-badge">${g}</span>`).join('')}
                 </div>`;
             }
 
@@ -90,11 +98,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 actionHtml = `<a href="${game.steam_url}" target="_blank" rel="noopener noreferrer" class="card-action">
                     <i class="fa-brands fa-steam"></i> View on Steam
                 </a>`;
+            } else {
+                actionHtml = `<div class="card-action non-steam">
+                    <i class="fa-solid fa-circle-info"></i> Full Info on Web
+                </div>`;
             }
 
             card.innerHTML = `
-                <div class="card-image" style="background-image: url('${imageUrl}')">
+                <div class="card-image ${!hasImage ? 'placeholder' : ''}" style="background-image: url('${imageUrl}')">
                     ${game.price ? `<div class="price-tag">${game.price}</div>` : ''}
+                    ${!hasImage ? `<div class="image-overlay"><span>${game.title}</span></div>` : ''}
                 </div>
                 <div class="card-content">
                     <h3 class="card-title">${game.title}</h3>

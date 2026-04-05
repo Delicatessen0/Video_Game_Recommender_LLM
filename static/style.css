@@ -126,6 +126,7 @@ header {
 .logo span {
     background: var(--accent-gradient);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -295,6 +296,33 @@ main {
     border-bottom: 1px solid var(--glass-border);
 }
 
+.card-image.placeholder {
+    filter: grayscale(0.5) brightness(0.6);
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1rem;
+    z-index: 1;
+}
+
+.image-overlay span {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
 .card-image::after {
     content: '';
     position: absolute;
@@ -303,6 +331,7 @@ main {
     width: 100%;
     height: 60%;
     background: linear-gradient(to top, var(--card-bg), transparent);
+    z-index: 0;
 }
 
 .price-tag {
@@ -369,12 +398,20 @@ main {
     text-decoration: none;
     border-radius: 8px;
     font-weight: 600;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.card-action:hover {
+.card-action:not(.non-steam):hover {
     background: rgba(255, 255, 255, 0.15);
+}
+
+.card-action.non-steam {
+    background: transparent;
+    border: 1px dashed var(--text-secondary);
+    color: var(--text-secondary);
+    cursor: default;
+    opacity: 0.7;
 }
 
 .card-action i {
